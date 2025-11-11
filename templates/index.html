@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Search System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .search-box {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .search-input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        #searchInput {
+            flex: 1;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        #searchButton {
+            padding: 15px 40px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-weight: 600;
+        }
+
+        #searchButton:hover {
+            transform: translateY(-2px);
+        }
+
+        #searchButton:active {
+            transform: translateY(0);
+        }
+
+        #searchButton:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .results-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .results-header {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .results-header h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .results-header .query-text {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .result-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .result-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .result-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .result-info {
+            padding: 15px;
+        }
+
+        .result-filename {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .result-score {
+            font-size: 12px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Image Search System</h1>
+            <p>Enter a description and AI will find the most matching images</p>
+        </div>
+
+        <div class="search-box">
+            <div class="search-input-wrapper">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Enter image description, e.g.: a cute cat, sunset landscape, red car, person walking..."
+                    onkeypress="if(event.key === 'Enter') searchImages()"
+                >
+                <button id="searchButton" onclick="searchImages()">Search</button>
+            </div>
+        </div>
+
+        <div class="results-container" id="resultsContainer">
+            <div class="results-header" id="resultsHeader"></div>
+            <div id="resultsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        async function searchImages() {
+            const query = document.getElementById('searchInput').value.trim();
+            
+            if (!query) {
+                alert('Please enter a search query');
+                return;
+            }
+
+            const resultsContainer = document.getElementById('resultsContainer');
+            const resultsHeader = document.getElementById('resultsHeader');
+            const resultsContent = document.getElementById('resultsContent');
+            const searchButton = document.getElementById('searchButton');
+
+            // Show loading state
+            resultsContainer.style.display = 'block';
+            resultsHeader.innerHTML = '<h2>Searching...</h2>';
+            resultsContent.innerHTML = '<div class="spinner"></div>';
+            searchButton.disabled = true;
+
+            try {
+                const response = await fetch('/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        top_k: 12
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Search failed');
+                }
+
+                // Display results
+                displayResults(data);
+
+            } catch (error) {
+                resultsContent.innerHTML = `
+                    <div class="error">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            } finally {
+                searchButton.disabled = false;
+            }
+        }
+
+        function displayResults(data) {
+            const resultsHeader = document.getElementById('resultsHeader');
+            const resultsContent = document.getElementById('resultsContent');
+
+            resultsHeader.innerHTML = `
+                <h2>Search Results</h2>
+                <p>Query: <span class="query-text">"${data.query}"</span> - Found ${data.results.length} result(s)</p>
+            `;
+
+            if (data.results.length === 0) {
+                resultsContent.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <h3>No matching images found</h3>
+                        <p>Try different search terms</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const grid = document.createElement('div');
+            grid.className = 'results-grid';
+
+            data.results.forEach(result => {
+                const item = document.createElement('div');
+                item.className = 'result-item';
+                item.onclick = () => window.open(`/image/${result.path}`, '_blank');
+                
+                item.innerHTML = `
+                    <img src="/image/${result.path}" alt="${result.filename}" loading="lazy">
+                    <div class="result-info">
+                        <div class="result-filename" title="${result.filename}">${result.filename}</div>
+                        <div class="result-score">Similarity: ${(result.score * 100).toFixed(1)}%</div>
+                    </div>
+                `;
+                
+                grid.appendChild(item);
+            });
+
+            resultsContent.innerHTML = '';
+            resultsContent.appendChild(grid);
+        }
+    </script>
+</body>
+</html>
+
+
