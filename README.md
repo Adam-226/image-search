@@ -1,23 +1,23 @@
-# 🔍 图像检索系统
+# 图像检索系统
 
 一个基于 CLIP 模型的简洁图像检索系统，可以根据文字描述从图像数据库中找到最匹配的图片。
 
-## ✨ 功能特点
+## 功能特点
 
-- 🎯 **文本到图像检索**: 输入文字描述，AI 智能匹配最相关的图片
-- 🚀 **基于 CLIP 模型**: 使用 OpenAI 的 CLIP 模型，理解图像和文本的语义关系
-- 💻 **简洁易用**: 提供命令行和 Web 界面两种使用方式
-- ⚡ **高效索引**: 预先构建图像特征索引，搜索速度快
-- 🌐 **灵活部署**: 支持本地运行和远程服务器部署
+- **文本到图像检索**: 输入文字描述，AI 智能匹配最相关的图片
+- **基于 CLIP 模型**: 使用 OpenAI 的 CLIP 模型，理解图像和文本的语义关系
+- **简洁易用**: 提供命令行和 Web 界面两种使用方式
+- **高效索引**: 预先构建图像特征索引，搜索速度快
+- **灵活部署**: 支持本地运行和远程服务器部署
 
-## 📋 环境要求
+## 环境要求
 
 - Python 3.8+
 - PyTorch 2.0+
 - 足够的内存来加载 CLIP 模型（建议 4GB+）
 - （可选）GPU 用于加速索引构建
 
-## 🛠️ 安装步骤
+## 安装步骤
 
 1. **克隆或下载项目**
 
@@ -32,7 +32,7 @@ pip install -r requirements.txt
 > export HF_ENDPOINT=https://hf-mirror.com
 > ```
 
-## 🚀 快速开始
+## 快速开始
 
 ### 1. 准备图像数据
 
@@ -90,7 +90,7 @@ python app.py
 
 > Web 界面提供了更直观的可视化搜索体验。
 
-## 📁 项目结构
+## 项目结构
 
 ```
 image-search/
@@ -106,7 +106,7 @@ image-search/
 └── image_index.pkl      # 索引文件（自动生成）
 ```
 
-## 💡 使用示例
+## 使用示例
 
 ### 命令行示例
 
@@ -143,7 +143,7 @@ python search.py --query "your search query" --index_path my_index.pkl
 - `fresh fruits on table`
 - `motorcycle on road`
 
-## 🔧 工作原理
+## 工作原理
 
 1. **特征提取**: 使用 CLIP 模型将图像编码为高维特征向量
 2. **索引构建**: 预先提取所有图像的特征并保存
@@ -151,7 +151,7 @@ python search.py --query "your search query" --index_path my_index.pkl
 4. **相似度计算**: 计算文本特征与所有图像特征的余弦相似度
 5. **返回结果**: 返回相似度最高的前 k 张图片
 
-## ⚙️ 技术栈
+## 技术栈
 
 - **深度学习框架**: PyTorch
 - **模型**: OpenAI CLIP (ViT-B/32)
@@ -159,18 +159,18 @@ python search.py --query "your search query" --index_path my_index.pkl
 - **图像处理**: Pillow
 - **数据处理**: NumPy
 
-## 📝 注意事项
+## 注意事项
 
 - 首次运行会下载 CLIP 模型（约 600MB），需要网络连接
 - 构建索引的时间取决于图像数量，大约每秒处理 2-10 张图片
 - 如果有 GPU，会自动使用 GPU 加速，否则使用 CPU
 - 图像越多，占用的内存也越多
 
-## 🎯 使用技巧
+## 使用技巧
 
-1. **使用英文描述效果最佳** ⭐: 经过测试，英文查询的准确度明显高于中文
-   - ✅ 推荐：`"a cat sitting on sofa"`
-   - ⚠️ 次选：`"一只猫坐在沙发上"`
+1. **使用英文描述效果最佳**: 经过测试，英文查询的准确度明显高于中文
+   - 推荐：`"a cat sitting on sofa"`
+   - 次选：`"一只猫坐在沙发上"`
 
 2. **描述要具体**: `"orange cat lying on red sofa"` 比 `"cat"` 的搜索结果更准确
 
@@ -183,7 +183,7 @@ python search.py --query "your search query" --index_path my_index.pkl
 
 5. **定期更新索引**: 添加新图片后，需要重新运行 `build_index.py`
 
-## ❓ 常见问题
+## 常见问题
 
 ### Q: 模型下载超时怎么办？
 
@@ -234,7 +234,7 @@ A: 取决于内存大小：
 - 16GB 内存：约 10000+ 张
 - 更大规模建议使用向量数据库（如 Faiss）
 
-## 🤝 扩展建议
+## 扩展建议
 
 - 添加图像预处理（如调整大小、增强等）
 - 支持视频帧检索
@@ -242,11 +242,11 @@ A: 取决于内存大小：
 - 集成向量数据库（如 Faiss）以支持更大规模的图像库
 - 添加用户管理和搜索历史功能
 
-## 📄 许可证
+## 许可证
 
 本项目仅供学习和研究使用。
 
-## 🙏 致谢
+## 致谢
 
 - [OpenAI CLIP](https://github.com/openai/CLIP) - 提供强大的视觉-语言模型
 - [Hugging Face Transformers](https://huggingface.co/transformers/) - 模型加载和推理
