@@ -12,10 +12,9 @@
 
 ## 环境要求
 
-- Python 3.8+
-- PyTorch 2.0+
+- Python 3.12
+- PyTorch 2.3.0
 - 足够的内存来加载 CLIP 模型（建议 4GB+）
-- （可选）GPU 用于加速索引构建
 
 ## 安装步骤
 
@@ -81,14 +80,6 @@ python app.py
 ```
 
 然后在浏览器中打开 `http://127.0.0.1:6006`
-
-**远程服务器（AutoDL 等）**：
-
-1. 在服务器上运行 `python app.py`
-2. 在 AutoDL 控制台查看"自定义服务"链接
-3. 点击链接即可在浏览器中访问
-
-> Web 界面提供了更直观的可视化搜索体验。
 
 ## 项目结构
 
@@ -158,89 +149,6 @@ python search.py --query "your search query" --index_path my_index.pkl
 - **Web 框架**: Flask
 - **图像处理**: Pillow
 - **数据处理**: NumPy
-
-## 注意事项
-
-- 首次运行会下载 CLIP 模型（约 600MB），需要网络连接
-- 构建索引的时间取决于图像数量，大约每秒处理 2-10 张图片
-- 如果有 GPU，会自动使用 GPU 加速，否则使用 CPU
-- 图像越多，占用的内存也越多
-
-## 使用技巧
-
-1. **使用英文描述效果最佳**: 经过测试，英文查询的准确度明显高于中文
-   - 推荐：`"a cat sitting on sofa"`
-   - 次选：`"一只猫坐在沙发上"`
-
-2. **描述要具体**: `"orange cat lying on red sofa"` 比 `"cat"` 的搜索结果更准确
-
-3. **可以描述场景和细节**: 
-   - `"airplane flying in blue sky"`
-   - `"person walking in the park"`
-   - `"red sports car parked"`
-
-4. **可以描述风格**: 例如 `"watercolor landscape"`, `"black and white photo"` 等
-
-5. **定期更新索引**: 添加新图片后，需要重新运行 `build_index.py`
-
-## 常见问题
-
-### Q: 模型下载超时怎么办？
-
-A: 国内用户可能遇到 Hugging Face 连接问题，设置镜像源即可：
-
-```bash
-# 临时使用
-export HF_ENDPOINT=https://hf-mirror.com
-python build_index.py --image_folder images
-
-# 或永久添加到 ~/.bashrc 或 ~/.zshrc
-echo 'export HF_ENDPOINT=https://hf-mirror.com' >> ~/.bashrc
-source ~/.bashrc
-```
-
-### Q: 出现 "torch.load" 安全警告怎么办？
-
-A: 这是 PyTorch 版本问题，代码已经配置使用更安全的 safetensors 格式，无需担心。如果仍有问题，升级 PyTorch：
-
-```bash
-pip install --upgrade torch torchvision
-```
-
-### Q: 如何在远程服务器上使用 Web 界面？
-
-A: 代码已配置为监听所有网络接口（`0.0.0.0:6006`）：
-
-**AutoDL 用户**：
-1. 运行 `python app.py`
-2. 在 AutoDL 控制台查看"自定义服务"或端口 6006 的访问链接
-
-**其他云服务器**：
-- 确保防火墙开放 6006 端口
-- 通过 `http://服务器IP:6006` 访问
-
-### Q: 为什么搜索结果不准确？
-
-A: 几个建议：
-1. **使用英文描述**（最重要！）
-2. 确保图片库中有相关图片
-3. 使用更具体的描述
-4. 尝试不同的表述方式
-
-### Q: 可以处理多少张图片？
-
-A: 取决于内存大小：
-- 8GB 内存：约 1000-5000 张
-- 16GB 内存：约 10000+ 张
-- 更大规模建议使用向量数据库（如 Faiss）
-
-## 扩展建议
-
-- 添加图像预处理（如调整大小、增强等）
-- 支持视频帧检索
-- 添加图像分类和标签功能
-- 集成向量数据库（如 Faiss）以支持更大规模的图像库
-- 添加用户管理和搜索历史功能
 
 ## 许可证
 
